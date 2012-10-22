@@ -458,9 +458,9 @@ __NOTE:__ Not tested!
     $query = new \Sparse\Query('GameScore');
     $query->equalTo('playerName',"Sean Plott");
     $count = $query->count();
-````
 
     echo("Sean has played " . $count . " games");
+````
 
 ### Compound Queries
 
@@ -500,15 +500,21 @@ These are stubbed in but are no-ops:
 
 Sets the seldom used 'arrayKey'
 
+````php
     $query->arrayKey($n);
+````
 
 Get the class name of the Query:
 
+````php
     $query->className();
+````
 
 Add 'or' queries
 
+````php
     $query->matchesOrQueries($queries);
+````
 
 ## Collections
 
@@ -565,7 +571,9 @@ The JS API uses a static login method, right now we have an instance method.
 
 ### Resetting Passwords
 
+````php
     Sparse\User::requestPasswordReset("email@example.com");
+````
 
 ## Roles
 
