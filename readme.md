@@ -34,10 +34,11 @@ The only setup is to give the rest client class (Rest.php) your parse credential
 
 This can be done anywhere or for portability just in Sparse.php like so:
 
+````php
     // Your credentials:
     Rest::$applicationId = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
     Rest::$restAPIKey = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
-
+````
 If done outside a Sparse namespaced file, you'll need the namespace:
 
     // Your credentials:
