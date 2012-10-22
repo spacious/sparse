@@ -387,7 +387,7 @@ __NOTE:__ Not tested!
 
 ````php
     $query->equalTo("arrayKey", 2);
-    ````
+````
 
 ### Queries on String Values
 
@@ -409,7 +409,7 @@ __NOTE:__ Not tested!
 
     $query = new \Sparse\Query("BarbecueSauce");
     $query->endsWith("Original Recipe");
-    ````
+````
 
 ### Relational Queries
 
@@ -450,7 +450,7 @@ __NOTE:__ Not tested!
             $post = $comment->parent;
         }
     }
-    ````
+````
 
 ### Counting Objects
 
@@ -458,7 +458,7 @@ __NOTE:__ Not tested!
     $query = new \Sparse\Query('GameScore');
     $query->equalTo('playerName',"Sean Plott");
     $count = $query->count();
-    ````
+````
 
     echo("Sean has played " . $count . " games");
 
@@ -473,7 +473,7 @@ __NOTE:__ Not tested!
 
     $mainQuery = \Sparse\Query::queryWithOrQueries(array($lotsOfWins,$fewWins));
     $results = $mainQuery->find();
-    ````
+````
 
 ### Query method name differences from JS API:
 
@@ -532,7 +532,7 @@ __NOTE:__ Collections NOT yet implemented
     // or
 
     $user = Sparse\User::signUpUser("my name","my pass",array('email'=>"email@example.com"));
-    ````
+````
 
 ### Logging In
 
@@ -547,7 +547,7 @@ The JS API uses a static login method, right now we have an instance method.
     // or just use the rest class
     $restClient = new Sparse\Rest();
     $loggedIn = $restClient->login($username,$password);
-    ````
+````
 
 ### Current User
 
@@ -561,7 +561,7 @@ The JS API uses a static login method, right now we have an instance method.
 
     Sparse\User::logOut();
     $currentUser = Sparse\User::current(); // this will now be null
-    ````
+````
 
 ### Resetting Passwords
 
@@ -589,7 +589,7 @@ All the options available for Push via the REST API are supported.
         'channels' => array('channel1','channel2'),
         'data' => array('message'=>'blah')
     ));
-    ````
+````
 
 ## Cloud
 
