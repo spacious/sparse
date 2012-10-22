@@ -427,7 +427,7 @@ class Rest {
                 }else{
                     if(isset($decoded->error)){
                         $this->_error = $decoded->error;
-                        echo($this->_error);
+                        //echo($this->_error);
                         if(isset($decoded->code)){
                             $this->_errorCode = $decoded->code;
                         }
