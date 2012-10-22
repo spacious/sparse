@@ -41,9 +41,11 @@ This can be done anywhere or for portability just in Sparse.php like so:
 ````
 If done outside a Sparse namespaced file, you'll need the namespace:
 
+````php
     // Your credentials:
     \Sparse\Rest::$applicationId = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
     \Sparse\Rest::$restAPIKey = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+````
 
 ## Simple usage
 
@@ -60,13 +62,16 @@ We'll try to also mimic parse's documentation structure and note APIs which have
 
 With Sparse it's usually easier to just use Object directly without subclassing it, like:
 
+````php
     $gameScore = new Sparse\Object('GameScore');
     // or create with data (associative array of attributes)
     $data = array('score'=>1337,'playerName'=>"Sean Plott",'cheatMode'=>false);
     $gameScore = new Sparse\Object('GameScore', $data);
+````
 
 If you use the object a lot or need custom methods you can extend as so:
 
+````php
     class Monster extends Sparse\Object {
 
         public function __construct($attributes=array()){
@@ -83,11 +88,13 @@ If you use the object a lot or need custom methods you can extend as so:
             $monster =
         }
     }
+````
 
 Sparse\\User is also an example of an Object subclass.
 
 ### Saving Objects
 
+````php
     $gameScore = new Sparse\Object('GameScore');
     $gameScore->set("score", 1337);
     $gameScore->set("playerName", "Sean Plott");
@@ -109,20 +116,26 @@ Sparse\\User is also an example of an Object subclass.
 
         die('Could not save GameScore.'."<br />");
     }
+````
 
 Your object will now have the following properties:
 
+````php
     echo('objectId: '.$gameScore->objectId."<br />");
     echo('createdAt: '.$gameScore->createdAt."<br />");
+````
 
 Just like the JS API, you can set your properties on save() as well:
 
+````php
     $gameScore = new Sparse\Object('GameScore');
     $data = array('score'=>1337,'playerName'=>"Sean Plott",'cheatMode'=>false);
     $gameScore->save($data);
+````
 
 ### Retrieving Objects
 
+````php
     // Using a Query
 
     $query = new \Sparse\Query('GameScore');
@@ -149,9 +162,11 @@ Just like the JS API, you can set your properties on save() as well:
     echo('objectId: '.$gameScore->objectId."<br />");
     echo('createdAt: '.$gameScore->createdAt."<br />");
     echo('updatedAt: '.$gameScore->updatedAt."<br />");
+````
 
 ### Updating Objects
 
+````php
     $gameScore = new Sparse\Object('GameScore');
     $gameScore->set("score", 1337);
     $gameScore->set("playerName", "Sean Plott");
@@ -166,36 +181,46 @@ Just like the JS API, you can set your properties on save() as well:
         $gameScore->set("cheatMode", true);
         $gameScore->save();
     }
+````
 
 #### Counters
 
+````php
     $gameScore->increment('score');
     $gameScore->save();
+````
 
 #### Arrays
 
+````php
     $gameScore->addUnique("skills", "flying");
     $gameScore->add("skills", "kungfu");
     $gameScore->remove("skills",'pwnage');
     $gameScore->save();
+````
 
 ### Destroying Objects
 
+````php
     $gameScore->destroy();
 
     if(!$gameScore->id()){
         echo('GameScore deleted.'."<br />");
     }
+````
 
 Delete a single field...
 
 __NOTE:__ Changed from unset() to unsetAttr() (unset is reserved in PHP)
 
+````php
     $gameScore->unsetAttr('playerName');
     $gameScore->save();
+````
 
 ### Relational Data
 
+````php
     $post = new \Sparse\Object('Post');
     $comment = new \Sparse\Object('Comment');
 
@@ -220,6 +245,7 @@ __NOTE:__ Changed from unset() to unsetAttr() (unset is reserved in PHP)
     $comment->fetch();
 
     $post = $comment->parent->fetch();
+````
 
 __NOTE:__ Parse Relations are NOT yet implemented
 
@@ -252,24 +278,32 @@ Get/Set all the attributes of an Object:
 
 __NOTE:__ Setting all the attributes directly does not set any as 'dirty'.
 
+````php
     $gameScore = new Sparse\Object('GameScore');
     $data = array('score'=>1337,'playerName'=>"Sean Plott",'cheatMode'=>false);
     $gameScore->attributes($data);
 
     $data = $gameScore->attributes();
+````
 
 Get the class name of the Object:
 
+````php
     $gameScore->className();
+````
 
 Get/Set objectId:
 
+````php
     $objectId = $gameScore->id();
     $gameScore->id('fc0Gy7fdf1');
+````
 
 Create a 'pointer' representation of this Object:
 
+````php
     $gameScore->pointer();
+````
 
 ## Queries
 
@@ -277,6 +311,7 @@ Create a 'pointer' representation of this Object:
 
 ### Basic Queries
 
+````php
     $query = new \Sparse\Query('GameScore');
     $query->equalTo('playerName','Dan Stemkoski');
     $gameScores = $query->find();
@@ -285,9 +320,11 @@ Create a 'pointer' representation of this Object:
 
         echo("Successfully retrieved ".count($gameScores)." scores."."<br />");
     }
+````
 
 ### Query constraints
 
+````php
     $query->notEqualTo('playerName','Michael Yabuti');
     $query->greaterThan("playerAge", 18);
 
@@ -336,6 +373,7 @@ Create a 'pointer' representation of this Object:
 
     // Finds objects that don't have the score set
     $query->doesNotExist("score");
+````
 
 ### Query constraints NOT yet implemented
 
@@ -347,10 +385,13 @@ Create a 'pointer' representation of this Object:
 
 __NOTE:__ Not tested!
 
+````php
     $query->equalTo("arrayKey", 2);
+    ````
 
 ### Queries on String Values
 
+````php
     $query = new \Sparse\Query("BarbecueSauce");
     $query->matches("name", '/^[A-Z][0-9]/');
     $sauces = $query->find();
@@ -368,9 +409,11 @@ __NOTE:__ Not tested!
 
     $query = new \Sparse\Query("BarbecueSauce");
     $query->endsWith("Original Recipe");
+    ````
 
 ### Relational Queries
 
+````php
     // equal to existing object:
     $post = new \Sparse\Object('Post');
     $post->id = '0HETDIVfuq';
@@ -407,17 +450,21 @@ __NOTE:__ Not tested!
             $post = $comment->parent;
         }
     }
+    ````
 
 ### Counting Objects
 
+````php
     $query = new \Sparse\Query('GameScore');
     $query->equalTo('playerName',"Sean Plott");
     $count = $query->count();
+    ````
 
     echo("Sean has played " . $count . " games");
 
 ### Compound Queries
 
+````php
     $lotsOfWins = new \Sparse\Query("Player");
     $lotsOfWins->greaterThan("wins",150);
 
@@ -426,6 +473,7 @@ __NOTE:__ Not tested!
 
     $mainQuery = \Sparse\Query::queryWithOrQueries(array($lotsOfWins,$fewWins));
     $results = $mainQuery->find();
+    ````
 
 ### Query method name differences from JS API:
 
@@ -470,6 +518,7 @@ __NOTE:__ Collections NOT yet implemented
 
 ### Signing up
 
+````php
     $user = new Sparse\User;
     $user->set("username", "my name");
     $user->set("password", "my pass");
@@ -483,11 +532,13 @@ __NOTE:__ Collections NOT yet implemented
     // or
 
     $user = Sparse\User::signUpUser("my name","my pass",array('email'=>"email@example.com"));
+    ````
 
 ### Logging In
 
 The JS API uses a static login method, right now we have an instance method.
 
+````php
     $user = new Sparse\User;
     $user->set("username", "my name");
     $user->set("password", "my pass");
@@ -496,9 +547,11 @@ The JS API uses a static login method, right now we have an instance method.
     // or just use the rest class
     $restClient = new Sparse\Rest();
     $loggedIn = $restClient->login($username,$password);
+    ````
 
 ### Current User
 
+````php
     $currentUser = Sparse\User::current();
     if ($currentUser) {
         // do stuff with the user
@@ -508,6 +561,7 @@ The JS API uses a static login method, right now we have an instance method.
 
     Sparse\User::logOut();
     $currentUser = Sparse\User::current(); // this will now be null
+    ````
 
 ### Resetting Passwords
 
@@ -529,13 +583,16 @@ __NOTE:__ GeoPoints API NOT yet implemented
 
 All the options available for Push via the REST API are supported.
 
+````php
     // Super simple example
     Sparse\Push::send(array(
         'channels' => array('channel1','channel2'),
         'data' => array('message'=>'blah')
     ));
+    ````
 
 ## Cloud
 
+````php
     Sparse\Cloud::run('testMethod',array('someParam'));
-
+````
