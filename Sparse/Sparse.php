@@ -17,5 +17,5 @@ include("Query.php");
 include("Push.php");
 
 // Your credentials:
-Rest::$applicationId = "odzci8lJYxcEDHhAMF8GmZF28P6kK6x9mzfVqQvZ";
-Rest::$restAPIKey = "xLL2UkGaHKkAEC0zYWE3B8J1Vf6FtuhBGkc2zTAN";
+//Rest::$applicationId = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+//Rest::$restAPIKey = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
