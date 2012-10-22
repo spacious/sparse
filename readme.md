@@ -85,7 +85,14 @@ If you use the object a lot or need custom methods you can extend as so:
 
         public static function spawn($strength){
 
-            $monster =
+            // many ways to do this
+            $monster = new Monster(array('strength'=>$strength));
+            $monster->set('strength',$strength); // or $monster->strength = $strength;
+
+            // or just simply:
+            //$monster = new Monster(array('strength'=>$strength));
+
+            return $monster;
         }
     }
 ````
