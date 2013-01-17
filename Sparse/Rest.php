@@ -10,16 +10,22 @@ class Rest {
     public static $applicationId;
     public static $restAPIKey;
 
-    const API_URL = 'https://api.parse.com/1/';
+    const API_URL = 'https://api.parse.com';
+    const API_VERSION = 1;
     const USER_AGENT = 'SparseRest/0.1';
     const OBJECT_PATH_PREFIX = 'classes';
     const USER_PATH = 'users';
     const PASSWORD_RESET_PATH = 'requestPasswordReset';
     const LOGIN_PATH = 'login';
     const PUSH_PATH = 'push';
+    const BATCH_PATH = 'batch';
+
+    const DEFAULT_MODE = 0;
+    const BATCH_MODE = 1;
 
     public $timeout = 5;
     public $sessionToken;
+    public $mode = 0;//default mode
 
     protected $_response;
     protected $_responseHeaders;
@@ -28,6 +34,76 @@ class Rest {
     protected $_errorCode;
     protected $_error;
     protected $_count;
+
+    protected $_batchRequests = array();
+
+    // Batch ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+
+    /**
+     * Sets the mode to batch
+     */
+    public function beginBatch(){
+        $this->mode = Rest::BATCH_MODE;
+        $this->resetBatchRequests();
+    }
+
+    /**
+     * Clears any requests
+     */
+    public function resetBatchRequests(){
+        $this->_batchRequests = array();
+    }
+
+    /**
+     * Resets the mode to default and clears any requests WITHOUT sending
+     */
+    public function quitBatch(){
+        $this->mode = Rest::DEFAULT_MODE;
+        $this->resetBatchRequests();
+    }
+
+    /**
+     * @param $path
+     * @param $method
+     * @param array $data
+     * @return array
+     */
+    public function addBatchRequest($path,$method,$data=array()){
+
+        // GET is not supported, so ignore
+        if($method != 'GET'){
+            $request = array(
+                'method'=>$method,
+                // path must start with api version
+                'path'=>'/'.Rest::API_VERSION.'/'.$path);
+            // Not applicable to DELETE so think of it as optional
+            if(!empty($data)){
+                $request['body'] = (object)$data;
+            }
+
+            $this->_batchRequests[] = $request;
+        }
+
+        return $this->_batchRequests;
+    }
+
+    /**
+     * Sends any batchRequests
+     * @return array
+     */
+    public function sendBatch(){
+
+        $results = array();
+
+        if(!empty($this->_batchRequests)){
+            $data = array('requests' => $this->_batchRequests);
+            $results = $this->request(Rest::BATCH_PATH,'POST',$data);
+        }
+
+        $this->quitBatch();
+        return $results;
+    }
 
     // Convenience Methods for Objects, Users, Push Notifications
 
@@ -310,7 +386,11 @@ class Rest {
      * @return array
      */
     public function post($path,$data){
-        return $this->request($path,'POST',$data);
+        if($this->mode == Rest::BATCH_MODE){
+            return $this->addBatchRequest($path,'POST',$data);
+        }else{
+            return $this->request($path,'POST',$data);
+        }
     }
 
     /**
@@ -332,7 +412,11 @@ class Rest {
      * @return array
      */
     public function put($path,$data){
-        return $this->request($path,'PUT',$data);
+        if($this->mode == Rest::BATCH_MODE){
+            return $this->addBatchRequest($path,'PUT',$data);
+        }else{
+            return $this->request($path,'PUT',$data);
+        }
     }
 
     /**
@@ -342,7 +426,11 @@ class Rest {
      * @return array
      */
     public function delete($path){
-        return $this->request($path,'DELETE');
+        if($this->mode == Rest::BATCH_MODE){
+            return $this->addBatchRequest($path,'DELETE');
+        }else{
+            return $this->request($path,'DELETE');
+        }
     }
 
     // Protected/Private ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,7 +463,8 @@ class Rest {
         curl_setopt($c, CURLOPT_HTTPHEADER, $requestHeaders);
         curl_setopt($c, CURLOPT_CUSTOMREQUEST, $method);
 
-        $url = Rest::API_URL.$path;
+        $url = Rest::API_URL.'/'.Rest::API_VERSION.'/'.$path;
+
         curl_setopt($c, CURLOPT_URL, $url);
 
         if($method == 'PUT' || $method == 'POST'){
@@ -386,6 +475,8 @@ class Rest {
             }
             curl_setopt($c, CURLOPT_POSTFIELDS, $postData );
             //echo($url."<br />");
+            //echo($postData."<br />");
+
         }else if(!empty($data)){
             if(isset($data['where'])){
                 $data['where'] = json_encode($data['where']);
@@ -411,6 +502,9 @@ class Rest {
 
         }else{
 
+            // Remove Continue Headers (batch)
+            $response = trim(str_replace('HTTP/1.1 100 Continue','',$response));
+
             list($header, $body) = explode("\r\n\r\n", $response, 2);
 
             $this->_responseHeaders = $this->http_parse_headers($header);
@@ -422,12 +516,13 @@ class Rest {
             $decoded = json_decode($body);
 
             if(is_object($decoded)){
+
                 if(isset($decoded->results)){
                     $this->_results = $decoded->results;
                 }else{
                     if(isset($decoded->error)){
                         $this->_error = $decoded->error;
-                        //echo($this->_error);
+                        echo($this->_error);
                         if(isset($decoded->code)){
                             $this->_errorCode = $decoded->code;
                         }
@@ -438,9 +533,11 @@ class Rest {
                 if(isset($decoded->count)){
                     $this->_count = (int)$decoded->count;
                 }
-            }
 
-            //print_r($this->details());
+            }else if(is_array($decoded)){
+
+                $this->_results = $decoded;
+            }
 
             return $this->_results;
         }
