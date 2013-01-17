@@ -245,7 +245,7 @@ class Object {
      * @return bool
      */
     public function has($key){
-        return !empty($this->_attributes[$key]);
+        return array_key_exists($key, $this->_attributes);
     }
 
     /**
